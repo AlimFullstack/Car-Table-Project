@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 
-// Тип одной машины
 export interface Car {
   Name: string;
   Miles_per_Gallon: number | null;
@@ -32,13 +31,15 @@ export const useCarsStore = defineStore("cars", {
 
       this.isLoading = true;
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
         const response = await fetch(`/data/cars-${this.fileIndex}.json`);
+        if (!response.ok) {
+          throw new Error(`Failed to load cars-${this.fileIndex}.json`);
+        }
         const data: Car[] = await response.json();
         this.cars.push(...data);
         this.fileIndex++;
       } catch (error) {
-        console.error("Ошибка загрузки:", error);
+        console.error("Failed to load car data:", error);
       } finally {
         this.isLoading = false;
       }
